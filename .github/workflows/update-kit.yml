@@ -1,0 +1,38 @@
+# Brings the ClassVR Prototyping Kit (the `kit/` submodule) up to the latest
+# version on its main branch. Runs every Monday morning, or on demand from the
+# Actions tab: "Update the prototyping kit" -> Run workflow. No terminal needed.
+name: Update the prototyping kit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * 1"   # Mondays 07:00 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Move the kit to the latest main
+        id: bump
+        run: |
+          before=$(git -C kit rev-parse --short HEAD)
+          git submodule update --remote --merge kit
+          after=$(git -C kit rev-parse --short HEAD)
+          echo "before=$before" >> "$GITHUB_OUTPUT"
+          echo "after=$after"   >> "$GITHUB_OUTPUT"
+          version=$(python3 -c "import json;print(json.load(open('kit/plugins/classvr-prototyping-kit/.claude-plugin/plugin.json'))['version'])")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Commit if anything changed
+        if: steps.bump.outputs.before != steps.bump.outputs.after
+        run: |
+          git config user.name  "kit-updater"
+          git config user.email "kit-updater@users.noreply.github.com"
+          git add kit
+          git commit -m "Update the prototyping kit to ${{ steps.bump.outputs.version }} (${{ steps.bump.outputs.after }})"
+          git push

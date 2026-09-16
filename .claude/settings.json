@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "classvr-prototypes": {
+      "source": { "source": "github", "repo": "ClassVR-Prototypes/classvr-prototyping-kit" }
+    }
+  },
+  "enabledPlugins": {
+    "classvr-prototyping-kit@classvr-prototypes": true
+  }
+}
