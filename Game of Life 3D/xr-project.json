@@ -6,7 +6,7 @@
   "dof": 6,
   "created": "2026-09-16T10:37:48Z",
   "build": 1,
-  "sourceHash": null,
+  "sourceHash": "f16f7cf3c45c9beb7e741711b5b3351fe1a268edd9eb6bc9704da11ddd90604c",
   "libraries": [
     "aframe"
   ],
@@ -26,9 +26,9 @@
     "lastShared": null
   },
   "pages": {
-    "url": null,
-    "repo": null,
-    "build": null,
-    "lastShared": null
+    "url": "https://classvr-prototypes.github.io/xr-game-of-life/game-of-life-3d/",
+    "repo": "ClassVR-Prototypes/xr-game-of-life",
+    "build": 1,
+    "lastShared": "2026-09-16T10:49:57Z"
   }
 }
