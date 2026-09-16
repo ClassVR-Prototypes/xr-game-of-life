@@ -18,11 +18,14 @@ window.KIT_CONTROLS = {
     'Press the VR button to enter',
     'Left thumbstick: move',
     'Right thumbstick left / right: turn 45°',
+    'Trigger: bring the cell you are pointing at to life, or kill it',
+    'Point at the buttons under the cube: Pause, Step, Random, Clear',
     'Something wrong? Squeeze both triggers and hold for two seconds — a ring fills, then the moment is marked for Claude'
   ],
   desktop: [
     'Right-click and drag to look around',
     'Left-click: press what the centre ring points at (the trigger)',
+    'Left-click on the cube: bring that cell to life, or kill it',
     'W, A, S, D: move',
     'Q / E: turn',
     'Something wrong? Press F — it marks the moment for Claude'
@@ -42,13 +45,72 @@ window.KIT_CONTROLS = {
      needs to wait. Keep each under a couple of seconds. -->
 <script>
 window.KIT_CHECKS = [
-  // { name: 'a ball appears when you press the trigger', run: function (t) {
-  //     var before = t.count('.ball');
-  //     t.press('right', 'trigger');
-  //     return t.wait(300).then(function () {
-  //       t.expect(t.count('.ball') === before + 1, 'no new ball was added to the scene');
-  //     });
-  // } }
+  { name: 'the cube starts full of living cells', run: function (t) {
+      t.expect(t.find('#life'), 'the cube of cells is missing from the scene');
+      t.expect(window.APP && window.APP.population > 20,
+               'the cube started with ' + ((window.APP && window.APP.population) || 0) + ' living cells');
+  } },
+
+  { name: 'the Pause button stops the generations advancing', run: function (t) {
+      t.click('#btn-play');
+      t.expect(window.APP.paused, 'pressing Pause did not pause the simulation');
+      var was = window.APP.generation;
+      return t.wait(900).then(function () {
+        t.expect(window.APP.generation === was,
+                 'the generation still went from ' + was + ' to ' + window.APP.generation + ' while paused');
+      });
+  } },
+
+  { name: 'the Step button advances exactly one generation', run: function (t) {
+      var was = window.APP.generation;
+      t.click('#btn-step');
+      t.expect(window.APP.generation === was + 1,
+               'one press of Step went from generation ' + was + ' to ' + window.APP.generation);
+  } },
+
+  { name: 'pointing at a cell and pressing changes it', run: function (t) {
+      var head = t.find('#head');
+      head.object3D.position.set(0, 1.6, 0);            // the walking check left us elsewhere
+      return t.wait(150).then(function () {
+        var pop = window.APP.population, toggles = window.APP.toggleCount;
+        t.expect(window.APP.grid.targets.gaze != null, 'looking straight at the cube found no cell to press');
+        t.find('a-scene').canvas.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true }));
+        return t.wait(100).then(function () {
+          t.expect(window.APP.toggleCount === toggles + 1, 'the press did not reach a cell');
+          t.expect(Math.abs(window.APP.population - pop) === 1,
+                   'the number of living cells went from ' + pop + ' to ' + window.APP.population + ', expected a change of one');
+        });
+      });
+  } },
+
+  { name: 'the readout turns to face you when you move', run: function (t) {
+      var THREE = AFRAME.THREE, rig = t.find('#rig').object3D, pivot = t.find('#sign-pivot').object3D;
+      var home = rig.position.clone();
+      rig.position.set(2.6, 0, -2.6);                     // stand round the side of the cube
+      return t.wait(250).then(function () {
+        var cam = t.find('a-scene').components['xr-kit'].headObject();
+        var toMe = cam.getWorldPosition(new THREE.Vector3()).sub(pivot.getWorldPosition(new THREE.Vector3()));
+        toMe.y = 0; toMe.normalize();
+        var facing = new THREE.Vector3(0, 0, 1).applyQuaternion(pivot.getWorldQuaternion(new THREE.Quaternion()));
+        facing.y = 0; facing.normalize();
+        rig.position.copy(home);
+        t.expect(facing.dot(toMe) > 0.9, 'the readout was still facing ' + facing.x.toFixed(2) + ' ' + facing.z.toFixed(2));
+      });
+  } },
+
+  { name: 'the Clear button empties the cube', run: function (t) {
+      t.click('#btn-clear');
+      t.expect(window.APP.population === 0, window.APP.population + ' cells were still alive after Clear');
+      t.expect(window.APP.paused, 'clearing the cube should leave it paused so you can draw in it');
+  } },
+
+  { name: 'the Random button fills the cube with a new pattern', run: function (t) {
+      var seeds = window.APP.reseeds;
+      t.click('#btn-random');
+      t.expect(window.APP.reseeds === seeds + 1, 'Random did not make a new pattern');
+      t.expect(window.APP.generation === 0, 'Random left the counter at generation ' + window.APP.generation);
+      t.expect(window.APP.population > 20, 'Random only brought ' + window.APP.population + ' cells to life');
+  } }
 ];
 </script>
 
