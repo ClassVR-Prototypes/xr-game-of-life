@@ -1,0 +1,34 @@
+{
+  "kit": "classvr-prototyping-kit",
+  "name": "Game of Life 3D",
+  "slug": "game-of-life-3d",
+  "concept": "A 3D Conway's Game of Life: a floating cube of cells you can walk around, toggle by pointing, and watch evolve generation by generation.",
+  "dof": 6,
+  "created": "2026-09-16T10:37:48Z",
+  "build": 1,
+  "sourceHash": "f16f7cf3c45c9beb7e741711b5b3351fe1a268edd9eb6bc9704da11ddd90604c",
+  "libraries": [
+    "aframe"
+  ],
+  "classcloud": {
+    "organizationId": null,
+    "playlistId": null,
+    "playlistName": "XR Prototypes",
+    "activityId": null,
+    "lastPublished": null,
+    "lastUrl": null,
+    "qrPayload": null
+  },
+  "artifact": {
+    "url": null,
+    "owner": null,
+    "build": null,
+    "lastShared": null
+  },
+  "pages": {
+    "url": "https://classvr-prototypes.github.io/xr-game-of-life/game-of-life-3d/",
+    "repo": "ClassVR-Prototypes/xr-game-of-life",
+    "build": 1,
+    "lastShared": "2026-09-16T10:49:57Z"
+  }
+}
