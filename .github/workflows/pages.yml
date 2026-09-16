@@ -25,15 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # The site builder draws each app's QR code with the `qrcode` package.
-      # The runner's system python has no pip, so it installed nothing and
-      # published pages with no way to reach a headset; this gives it a python
-      # that can. A failure here is a page without a QR, not a failed deploy.
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: QR code support
-        run: python3 -m pip install --quiet qrcode || echo "::warning::qrcode could not be installed — publishing without QR codes"
+      # The site builder draws each app's QR code itself, with no packages to
+      # install — the runner's system python is enough.
       - name: Assemble the site
         run: python3 .github/scripts/build_pages.py --out _site
       - uses: actions/upload-pages-artifact@v3
